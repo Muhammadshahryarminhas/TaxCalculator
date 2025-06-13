@@ -77,11 +77,11 @@ const calculateTax = (annualSalary: number, fiscalYear: string): number => {
 
 function App() {
   const [fiscalYear, setFiscalYear] = useState<string>('2025-26');
-  const [monthlySalary, setMonthlySalary] = useState<number>(110000);
-  const [medicalPercentage, setMedicalPercentage] = useState<number>(5);
+  const [monthlySalary, setMonthlySalary] = useState<number>(60000);
+  const [medicalPercentage, setMedicalPercentage] = useState<number>(10);
   const [isRevised, setIsRevised] = useState<boolean>(false);
   const [revisionMonth, setRevisionMonth] = useState<number>(7);
-  const [newSalary, setNewSalary] = useState<number>(110000);
+  const [newSalary, setNewSalary] = useState<number>(60000);
 
   const months = [
     { value: 7, label: 'July', short: 'Jul', order: 1 },
