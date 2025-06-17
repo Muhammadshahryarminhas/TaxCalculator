@@ -373,7 +373,7 @@ function App() {
         {/* Tax Calculations Grid - 4 Cards */}
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
           {/* Card 1: Tax Without Medical Deduction */}
-          <div className="bg-white rounded-2xl shadow-lg border-l-4 border-l-red-500 overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-lg border-t-4 border-t-red-500 overflow-hidden">
             <div className="bg-red-50 px-8 py-6 border-b border-red-100">
               <div>
                 <h3 className="text-xl font-bold text-red-800 flex items-center">
@@ -408,7 +408,7 @@ function App() {
           </div>
 
           {/* Card 2: Tax With Medical Deduction */}
-          <div className="bg-white rounded-2xl shadow-lg border-l-4 border-l-emerald-500 overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-lg border-t-4 border-t-emerald-500 overflow-hidden">
             <div className="bg-emerald-50 px-8 py-6 border-b border-emerald-100">
               <div>
                 <h3 className="text-xl font-bold text-emerald-800 flex items-center">
@@ -452,7 +452,7 @@ function App() {
           </div>
 
           {/* Card 3: Monthly Tax Breakdown Without Medical */}
-          <div className="bg-white rounded-2xl shadow-lg border-l-4 border-l-blue-500 overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-lg border-t-4 border-t-blue-500 overflow-hidden">
             <div className="bg-blue-50 px-8 py-6 border-b border-blue-100">
               <div>
                 <h3 className="text-xl font-bold text-blue-800 flex items-center">
@@ -462,39 +462,62 @@ function App() {
                 <p className="text-blue-600 text-sm">Month-wise tax distribution</p>
               </div>
             </div>
-            <div className="p-6">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {getMonthlyBreakdown(false).map((month) => (
-                  <div
-                    key={month.value}
-                    className={`p-3 rounded-lg border-2 ${
-                      month.isRevisionMonth 
-                        ? 'border-blue-300 bg-blue-50' 
-                        : 'border-slate-200 bg-slate-50'
-                    }`}
-                  >
-                    <div className="text-center">
-                      <p className="text-xs font-medium text-slate-700">{month.short}</p>
-                      <p className="text-sm font-bold text-blue-600">{formatCurrency(month.monthlyTax)}</p>
-                      {month.isRevisionMonth && (
-                        <p className="text-xs text-blue-600 mt-1">Revision</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
+            <div className="p-8">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-slate-200">
+                      <th className="text-left py-2 px-3 text-xs font-medium text-slate-600">Month</th>
+                      <th className="text-right py-2 px-3 text-xs font-medium text-slate-600">Tax</th>
+                      <th className="text-right py-2 px-3 text-xs font-medium text-slate-600">Remaining</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {getMonthlyBreakdown(false).map((month) => (
+                      <tr 
+                        key={month.value}
+                        className={`border-b border-slate-100 ${
+                          month.isRevisionMonth ? 'bg-blue-50' : ''
+                        }`}
+                      >
+                        <td className="py-2 px-3">
+                          <div className="flex items-center">
+                            <span className="text-sm font-medium text-slate-700">{month.short}</span>
+                            {month.isRevisionMonth && (
+                              <span className="ml-2 text-xs text-blue-600">(Revision)</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-2 px-3 text-right">
+                          <span className="text-sm font-bold text-blue-600">{formatCurrency(month.monthlyTax)}</span>
+                        </td>
+                        <td className="py-2 px-3 text-right">
+                          <span className="text-sm text-slate-600">{formatCurrency(month.salary - month.monthlyTax)}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr className="border-t-2 border-slate-200 bg-slate-50">
+                      <td className="py-3 px-3">
+                        <span className="text-sm font-semibold text-slate-700">Total</span>
+                      </td>
+                      <td className="py-3 px-3 text-right">
+                        <span className="text-sm font-bold text-blue-600">{formatCurrency(calculations.taxWithoutMedical)}</span>
+                      </td>
+                      <td className="py-3 px-3 text-right">
+                        <span className="text-sm font-semibold text-slate-700">{formatCurrency(calculations.annualSalary - calculations.taxWithoutMedical)}</span>
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
               </div>
               
-              <div className="mt-4 pt-4 border-t border-slate-200">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-slate-600">Total Annual Tax</span>
-                  <span className="font-bold text-blue-600">{formatCurrency(calculations.taxWithoutMedical)}</span>
-                </div>
-              </div>
             </div>
           </div>
 
           {/* Card 4: Monthly Tax Breakdown With Medical */}
-          <div className="bg-white rounded-2xl shadow-lg border-l-4 border-l-purple-500 overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-lg border-t-4 border-t-purple-500 overflow-hidden">
             <div className="bg-purple-50 px-8 py-6 border-b border-purple-100">
               <div>
                 <h3 className="text-xl font-bold text-purple-800 flex items-center">
@@ -504,48 +527,126 @@ function App() {
                 <p className="text-purple-600 text-sm">Month-wise tax after medical deduction</p>
               </div>
             </div>
-            <div className="p-6">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {getMonthlyBreakdown(true).map((month) => (
-                  <div
-                    key={month.value}
-                    className={`p-3 rounded-lg border-2 ${
-                      month.isRevisionMonth 
-                        ? 'border-purple-300 bg-purple-50' 
-                        : 'border-slate-200 bg-slate-50'
-                    }`}
-                  >
-                    <div className="text-center">
-                      <p className="text-xs font-medium text-slate-700">{month.short}</p>
-                      <p className="text-sm font-bold text-purple-600">{formatCurrency(month.monthlyTax)}</p>
-                      {month.isRevisionMonth && (
-                        <p className="text-xs text-purple-600 mt-1">Revision</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
+            <div className="p-8">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-slate-200">
+                      <th className="text-left py-2 px-3 text-xs font-medium text-slate-600">Month</th>
+                      <th className="text-right py-2 px-3 text-xs font-medium text-slate-600">Tax</th>
+                      <th className="text-right py-2 px-3 text-xs font-medium text-slate-600">Remaining</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {getMonthlyBreakdown(true).map((month) => (
+                      <tr 
+                        key={month.value}
+                        className={`border-b border-slate-100 ${
+                          month.isRevisionMonth ? 'bg-purple-50' : ''
+                        }`}
+                      >
+                        <td className="py-2 px-3">
+                          <div className="flex items-center">
+                            <span className="text-sm font-medium text-slate-700">{month.short}</span>
+                            {month.isRevisionMonth && (
+                              <span className="ml-2 text-xs text-purple-600">(Revision)</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-2 px-3 text-right">
+                          <span className="text-sm font-bold text-purple-600">{formatCurrency(month.monthlyTax)}</span>
+                        </td>
+                        <td className="py-2 px-3 text-right">
+                          <span className="text-sm text-slate-600">{formatCurrency(month.salary - month.monthlyTax)}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr className="border-t-2 border-slate-200 bg-slate-50">
+                      <td className="py-3 px-3">
+                        <span className="text-sm font-semibold text-slate-700">Total</span>
+                      </td>
+                      <td className="py-3 px-3 text-right">
+                        <span className="text-sm font-bold text-purple-600">{formatCurrency(calculations.taxWithMedical)}</span>
+                      </td>
+                      <td className="py-3 px-3 text-right">
+                        <span className="text-sm font-semibold text-slate-700">{formatCurrency(calculations.annualTaxableSalary - calculations.taxWithMedical)}</span>
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
               </div>
-              
-              <div className="mt-4 pt-4 border-t border-slate-200">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-slate-600">Total Annual Tax</span>
-                  <span className="font-bold text-purple-600">{formatCurrency(calculations.taxWithMedical)}</span>
-                </div>
-              </div>
+
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="mt-12 text-center text-slate-500 text-sm">
-          <p>Tax calculations are based on Pakistani income tax slabs for fiscal year {fiscalYear}.</p>
-          <p className="mt-1">Please consult with a tax professional for accurate tax planning.</p>
-          {isRevised && (
-            <p className="mt-2 text-blue-600 font-medium">
-              Calculations include prorated salary revision from {months.find(m => m.value === revisionMonth)?.label} (Financial Year).
-            </p>
-          )}
+        <footer className="bg-white border rounded-2xl border-gray-200 py-8 px-4">
+      <div className="max-w-3xl mx-auto text-center">
+        <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+          Does it seem good to you?
+        </h2>
+        <p className="text-gray-500 mb-6">
+          Whether you're looking to start a project or need consultation, feel free to contact me.
+        </p>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+          <div className="flex flex-row text-left gap-4">
+          <img
+            src="/public/Profile.png"
+            alt="Shahryar Minhas"
+            className="w-12 h-12 rounded-full border-2 border-gray-300"
+          />
+          <div>
+            <div className="font-medium text-gray-900">Shahryar Minhas</div>
+            <div className="text-sm text-gray-500">graphy918@gmail.com</div>
+          </div>
+          </div>
+          <div className="flex gap-3 mt-3 sm:mt-0">
+            <a
+              href="https://www.linkedin.com/in/shahryarminhas/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-700 hover:text-blue-900 transition"
+              aria-label="LinkedIn"
+            >
+              {/* LinkedIn SVG */}
+              <img src="/linkedin.svg" alt="Twitter" className="w-7 h-7" />
+            </a>
+            <a
+              href="https://twitter.com/shahryrminhas"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:text-blue-600 transition"
+              aria-label="Twitter"
+            >
+              {/* Twitter SVG */}
+              <img src="/twitter.svg" alt="Twitter" className="w-7 h-7" />
+            </a>
+            <a
+              href="https://github.com/shahryrminhas"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-800 hover:text-black transition"
+              aria-label="GitHub"
+            >
+              {/* GitHub SVG */}
+              <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.084-.729.084-.729 1.205.084 1.84 1.236 1.84 1.236 1.07 1.834 2.809 1.304 3.495.997.108-.775.418-1.305.762-1.605-2.665-.305-5.466-1.334-5.466-5.93 0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23a11.52 11.52 0 0 1 3.003-.404c1.018.005 2.045.138 3.003.404 2.291-1.553 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.803 5.624-5.475 5.921.43.372.823 1.102.823 2.222 0 1.606-.014 2.898-.014 3.293 0 .322.216.694.825.576C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+              </svg>
+            </a>
+          </div>
         </div>
+        <hr className="my-6 border-gray-200" />
+        <div className="text-gray-500 text-sm">
+          Created with <span className="text-red-500">♥</span> by{" "}
+          <a href="https://www.linkedin.com/in/shahryarminhas/" className="text-blue-600 hover:underline">@shahryrminhas</a>
+          {" "}at{" "}
+          <a href="https://solux.studio" className="text-[# FF6A12] hover:underline">SoluxStudio</a>
+        </div>
+      </div>
+    </footer>
       </div>
     </div>
   );
