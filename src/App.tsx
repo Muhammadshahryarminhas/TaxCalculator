@@ -586,7 +586,7 @@ function App() {
         <footer className="bg-white border rounded-2xl border-gray-200 py-8 px-4">
       <div className="max-w-3xl mx-auto text-center">
         <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-          Does it seem good to you?
+        Work With Smart People, Save Time and Budget.
         </h2>
         <p className="text-gray-500 mb-6">
           Whether you're looking to start a project or need consultation, feel free to contact me.
@@ -594,7 +594,7 @@ function App() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
           <div className="flex flex-row text-left gap-4">
           <img
-            src="/public/Profile.png"
+            src="https://framerusercontent.com/images/JYthbEKlRhiEUox0ac0JfUpbnyU.jpg?scale-down-to=512"
             alt="Shahryar Minhas"
             className="w-12 h-12 rounded-full border-2 border-gray-300"
           />
