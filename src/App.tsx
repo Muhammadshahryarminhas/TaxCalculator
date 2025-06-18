@@ -1,28 +1,17 @@
-import React, { useState, useMemo, ChangeEvent } from 'react';
-import { Calculator, DollarSign, Receipt, Heart, ToggleLeft, ToggleRight, Calendar, BarChart3 } from 'lucide-react';
-// import VisitCounter from './components/VisitCounter';
-
-// Define types for tax slabs
-type TaxSlab = {
-  min: number;
-  max: number;
-  rate: number;
-  minTax: number | null;
-  maxTax?: number;
-};
-
-type TaxSlabs = {
-  [key: string]: {
-    slabs: TaxSlab[];
-  };
-};
+import React, { useState, useMemo } from 'react';
+import Header from './components/Header';
+import SalaryInput from './components/SalaryInput';
+import TaxCalculationCard from './components/TaxCalculationCard';
+import MonthlyBreakdown from './components/MonthlyBreakdown';
+import Footer from './components/Footer';
+import { TaxSlabs, Month, Calculations } from './components/types';
 
 // Tax calculation functions for different fiscal years
 const taxSlabs: TaxSlabs = {
   '2024-25': {
     slabs: [
       { min: 0, max: 600000, rate: 0, minTax: 0 },
-      { min: 600001, max: 1200000, rate: 0.05, minTax: 2500 },
+      { min: 600001, max: 1200000, rate: 0.05, minTax: null },
       { min: 1200001, max: 2200000, rate: 0.15, minTax: null },
       { min: 2200001, max: 3200000, rate: 0.25, minTax: null },
       { min: 3200001, max: 4100000, rate: 0.30, minTax: null },
@@ -32,7 +21,7 @@ const taxSlabs: TaxSlabs = {
   '2025-26': {
     slabs: [
       { min: 0, max: 600000, rate: 0, minTax: 0 },
-      { min: 600001, max: 1200000, rate: 0.01, minTax: null, maxTax: 6000 },
+      { min: 600001, max: 1200000, rate: 0.01, minTax: null },
       { min: 1200001, max: 2200000, rate: 0.11, minTax: null },
       { min: 2200001, max: 3200000, rate: 0.23, minTax: null },
       { min: 3200001, max: 4100000, rate: 0.30, minTax: null },
@@ -43,8 +32,6 @@ const taxSlabs: TaxSlabs = {
 
 const calculateTax = (annualSalary: number, fiscalYear: string): number => {
   if (fiscalYear === '2024-25') {
-    // Using the updated Excel formula for 2024-25
-    // =IF(B3<=600000,0,IF(B3<=1200000,MAX(2500,(B3-600000)*0.05),IF(B3<=2200000,30000+(B3-1200000)*0.15,IF(B3<=3200000,180000+(B3-2200000)*0.25,IF(B3<=4100000,430000+(B3-3200000)*0.3,700000+(B3-4100000)*0.35)))))
     if (annualSalary <= 600000) {
       return 0;
     } else if (annualSalary <= 1200000) {
@@ -84,7 +71,7 @@ function App() {
   const [revisionMonth, setRevisionMonth] = useState<number>(7);
   const [newSalary, setNewSalary] = useState<number>(60000);
 
-  const months = [
+  const months: Month[] = [
     { value: 7, label: 'July', short: 'Jul', order: 1 },
     { value: 8, label: 'August', short: 'Aug', order: 2 },
     { value: 9, label: 'September', short: 'Sep', order: 3 },
@@ -116,7 +103,7 @@ function App() {
     }
   };
 
-  const calculations = useMemo(() => {
+  const calculations = useMemo<Calculations>(() => {
     let annualSalary, monthlyMedicalAllowance, monthlyTaxableSalary, annualTaxableSalary;
 
     if (isRevised) {
@@ -158,23 +145,6 @@ function App() {
     };
   }, [fiscalYear, monthlySalary, medicalPercentage, isRevised, revisionMonth, newSalary]);
 
-  const getTaxSlabsDisplay = (fiscalYear: string): string[] => {
-    const slabs = taxSlabs[fiscalYear].slabs;
-    return slabs.map((slab, index) => {
-      if (index === 0) return `Up to Rs ${slab.max.toLocaleString()}: ${(slab.rate * 100)}%`;
-      if (index === 1 && fiscalYear === '2024-25') {
-        return `Rs ${slab.min.toLocaleString()} - Rs ${slab.max.toLocaleString()}: Max(Rs ${slab.minTax?.toLocaleString() ?? '0'}, ${(slab.rate * 100)}%)`;
-      }
-      if (index === 1 && fiscalYear === '2025-26') {
-        return `Rs ${slab.min.toLocaleString()} - Rs ${slab.max.toLocaleString()}: Min(Rs ${slab.maxTax?.toLocaleString() ?? '0'}, ${(slab.rate * 100)}%)`;
-      }
-      if (slab.max === Infinity) {
-        return `Above Rs ${slab.min.toLocaleString()}: ${(slab.rate * 100)}%`;
-      }
-      return `Rs ${slab.min.toLocaleString()} - Rs ${slab.max.toLocaleString()}: ${(slab.rate * 100)}%`;
-    });
-  };
-
   const getMonthlyBreakdown = (withMedical: boolean) => {
     return months.map((month) => {
       const monthPosition = getFinancialYearPosition(month.value);
@@ -214,464 +184,61 @@ function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-12">
-          <div className="flex items-center">
-            <Calculator className="w-12 h-12 text-slate-700 mr-3" />
-            <h1 className="text-4xl font-bold text-slate-800">Pakistan Income Tax Calculator {fiscalYear}</h1>
-          </div>
-          
-          {/* Fiscal Year Selector */}
-          <div className="flex items-center">
-            <select
-              value={fiscalYear}
-              onChange={(e: ChangeEvent<HTMLSelectElement>) => setFiscalYear(e.target.value)}
-              className="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-colors text-lg font-semibold bg-white"
-            >
-              <option value="2024-25">2024-25</option>
-              <option value="2025-26">2025-26</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Input Section */}
+        <Header fiscalYear={fiscalYear} onFiscalYearChange={setFiscalYear} />
+        
         <div className="mb-8">
-          <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
-            <h2 className="text-2xl font-semibold text-slate-700 mb-6 flex items-center">
-              <DollarSign className="w-6 h-6 mr-2" />
-              Salary Information
-            </h2>
-            
-            <div className="grid md:grid-cols-2 gap-6 my-5">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  {isRevised ? 'Initial Monthly Salary (PKR)' : 'Monthly Salary (PKR)'}
-                </label>
-                <input
-                  type="number"
-                  value={monthlySalary}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => setMonthlySalary(Number(e.target.value) || 0)}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-colors text-lg font-semibold"
-                  placeholder="Enter Salary"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Medical Allowance (%)
-                </label>
-                <input
-                  type="number"
-                  value={medicalPercentage}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => setMedicalPercentage(Number(e.target.value) || 0)}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-colors text-lg font-semibold"
-                  placeholder="5"
-                  min="0"
-                  max="100"
-                />
-              </div>
-            </div>
-
-            {/* Salary Revision Toggle */}
-            <div className="mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center">
-                  <Calendar className="w-5 h-5 text-slate-600 mr-2" />
-                  <span className="text-lg font-medium text-slate-700">Salary Revision</span>
-                  <span className="ml-2 text-sm text-slate-500">(Financial Year: July - June)</span>
-                </div>
-                <button
-                  onClick={() => setIsRevised(!isRevised)}
-                  className="flex items-center space-x-2 transition-colors duration-200"
-                >
-                  {isRevised ? (
-                    <ToggleRight className="w-8 h-8 text-blue-500" />
-                  ) : (
-                    <ToggleLeft className="w-8 h-8 text-slate-400" />
-                  )}
-                  <span className={`font-medium ${isRevised ? 'text-blue-600' : 'text-slate-500'}`}>
-                    Is salary increased?
-                  </span>
-                </button>
-              </div>
-              
-              {isRevised && (
-                <div className="grid md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-200">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Revision Month (Financial Year Order)
-                    </label>
-                    <select
-                      value={revisionMonth}
-                      onChange={(e: ChangeEvent<HTMLSelectElement>) => setRevisionMonth(Number(e.target.value))}
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-lg font-semibold bg-white"
-                    >
-                      {months.map((month) => (
-                        <option key={month.value} value={month.value}>
-                          {month.label} (Month {month.order})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Monthly Salary
-                    </label>
-                    <input
-                      type="number"
-                      value={newSalary}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) => setNewSalary(Number(e.target.value) || 0)}
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-lg font-semibold"
-                      placeholder="Enter Value greater then monthly salary"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            {/* Salary Summary */}
-            <div className="mt-6 pt-6 border-t border-slate-200">
-              {isRevised && (
-                <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <p className="text-sm text-blue-700 font-medium">
-                    Salary revised from {months.find(m => m.value === revisionMonth)?.label} 
-                    ({formatCurrency(monthlySalary)} → {formatCurrency(newSalary)})
-                  </p>
-                  <p className="text-xs text-blue-600 mt-1">
-                    {getFinancialYearPosition(revisionMonth) - 1} months at old salary, {12 - (getFinancialYearPosition(revisionMonth) - 1)} months at new salary
-                  </p>
-                </div>
-              )}
-              <div className="grid md:grid-cols-4 gap-4">
-                <div className="text-center">
-                  <p className="text-sm text-slate-600">
-                    {isRevised ? 'Prorated Annual Salary' : 'Annual Salary'}
-                  </p>
-                  <p className="text-lg font-bold text-slate-800">{formatCurrency(calculations.annualSalary)}</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-sm text-slate-600">
-                    {isRevised ? 'Current Monthly Medical' : 'Monthly Medical'}
-                  </p>
-                  <p className="text-lg font-bold text-slate-800">{formatCurrency(calculations.monthlyMedicalAllowance)}</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-sm text-slate-600">
-                    {isRevised ? 'Current Monthly Taxable' : 'Monthly Taxable'}
-                  </p>
-                  <p className="text-lg font-bold text-slate-800">{formatCurrency(calculations.monthlyTaxableSalary)}</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-sm text-slate-600">
-                    {isRevised ? 'Prorated Annual Taxable' : 'Annual Taxable'}
-                  </p>
-                  <p className="text-lg font-bold text-slate-800">{formatCurrency(calculations.annualTaxableSalary)}</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <SalaryInput
+            monthlySalary={monthlySalary}
+            newSalary={newSalary}
+            medicalPercentage={medicalPercentage}
+            isRevised={isRevised}
+            revisionMonth={revisionMonth}
+            months={months}
+            onMonthlySalaryChange={setMonthlySalary}
+            onNewSalaryChange={setNewSalary}
+            onMedicalPercentageChange={setMedicalPercentage}
+            onIsRevisedChange={setIsRevised}
+            onRevisionMonthChange={setRevisionMonth}
+            formatCurrency={formatCurrency}
+            getFinancialYearPosition={getFinancialYearPosition}
+          />
         </div>
 
-        {/* Tax Calculations Grid - 4 Cards */}
+        <TaxCalculationCard
+          fiscalYear={fiscalYear}
+          taxSlabs={taxSlabs}
+          calculations={calculations}
+          formatCurrency={formatCurrency}
+        />
+
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
-          {/* Card 1: Tax Without Medical Deduction */}
-          <div className="bg-white rounded-2xl shadow-lg border-t-4 border-t-red-500 overflow-hidden">
-            <div className="bg-red-50 px-8 py-6 border-b border-red-100">
-              <div>
-                <h3 className="text-xl font-bold text-red-800 flex items-center">
-                  <Receipt className="w-5 h-5 mr-2" />
-                  Tax Without Medical Deduction
-                </h3>
-                <p className="text-red-600 text-sm">Fiscal Year {fiscalYear}</p>
-              </div>
-            </div>
-            <div className="p-8">
-              <div className="space-y-4">
-                <div className="flex justify-between items-center py-3 border-b border-slate-100">
-                  <span className="text-slate-600">Annual Tax</span>
-                  <span className="font-bold text-lg text-red-600">{formatCurrency(calculations.taxWithoutMedical)}</span>
-                </div>
-                <div className="flex justify-between items-center py-3">
-                  <span className="text-slate-600">Monthly Tax</span>
-                  <span className="font-bold text-lg text-red-600">{formatCurrency(calculations.monthlyTaxWithoutMedical)}</span>
-                </div>
-              </div>
-              
-              {/* Tax Slabs */}
-              <div className="mt-6 pt-6 border-t border-slate-200">
-                <h4 className="font-semibold text-slate-700 mb-3">Tax Slabs {fiscalYear}</h4>
-                <div className="text-xs text-slate-600 space-y-1">
-                  {getTaxSlabsDisplay(fiscalYear).map((slab, index) => (
-                    <div key={index}>{slab}</div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+          <MonthlyBreakdown
+            title="Monthly Breakdown (No Medical)"
+            description="Month-wise tax distribution"
+            borderColor="blue-500"
+            textColor="blue-600"
+            bgColor="blue-50"
+            monthlyData={getMonthlyBreakdown(false)}
+            totalTax={calculations.taxWithoutMedical}
+            totalSalary={calculations.annualSalary}
+            formatCurrency={formatCurrency}
+          />
 
-          {/* Card 2: Tax With Medical Deduction */}
-          <div className="bg-white rounded-2xl shadow-lg border-t-4 border-t-emerald-500 overflow-hidden">
-            <div className="bg-emerald-50 px-8 py-6 border-b border-emerald-100">
-              <div>
-                <h3 className="text-xl font-bold text-emerald-800 flex items-center">
-                  <Heart className="w-5 h-5 mr-2" />
-                  Tax With Medical Deduction
-                </h3>
-                <p className="text-emerald-600 text-sm">Fiscal Year {fiscalYear}</p>
-              </div>
-            </div>
-            <div className="p-8">
-              <div className="space-y-4">
-                <div className="flex justify-between items-center py-3 border-b border-slate-100">
-                  <span className="text-slate-600">Annual Tax After Medical</span>
-                  <span className="font-bold text-lg text-emerald-600">{formatCurrency(calculations.taxWithMedical)}</span>
-                </div>
-                <div className="flex justify-between items-center py-3">
-                  <span className="text-slate-600">Monthly Tax After Medical</span>
-                  <span className="font-bold text-lg text-emerald-600">{formatCurrency(calculations.monthlyTaxWithMedical)}</span>
-                </div>
-              </div>
-              
-              {/* Savings Preview */}
-              <div className="mt-6 pt-6 border-t border-slate-200">
-                <h4 className="font-semibold text-slate-700 mb-3">Tax Savings</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Annual Savings</span>
-                    <span className="font-semibold text-emerald-600">
-                      {formatCurrency(calculations.taxWithoutMedical - calculations.taxWithMedical)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Monthly Savings</span>
-                    <span className="font-semibold text-emerald-600">
-                      {formatCurrency(calculations.monthlyTaxWithoutMedical - calculations.monthlyTaxWithMedical)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 3: Monthly Tax Breakdown Without Medical */}
-          <div className="bg-white rounded-2xl shadow-lg border-t-4 border-t-blue-500 overflow-hidden">
-            <div className="bg-blue-50 px-8 py-6 border-b border-blue-100">
-              <div>
-                <h3 className="text-xl font-bold text-blue-800 flex items-center">
-                  <BarChart3 className="w-5 h-5 mr-2" />
-                  Monthly Breakdown (No Medical)
-                </h3>
-                <p className="text-blue-600 text-sm">Month-wise tax distribution</p>
-              </div>
-            </div>
-            <div className="p-8">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-slate-200">
-                      <th className="text-left py-2 px-3 text-xs font-medium text-slate-600">Month</th>
-                      <th className="text-right py-2 px-3 text-xs font-medium text-slate-600">Tax</th>
-                      <th className="text-right py-2 px-3 text-xs font-medium text-slate-600">Remaining</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {getMonthlyBreakdown(false).map((month) => (
-                      <tr 
-                        key={month.value}
-                        className={`border-b border-slate-100 ${
-                          month.isRevisionMonth ? 'bg-blue-50' : ''
-                        }`}
-                      >
-                        <td className="py-2 px-3">
-                          <div className="flex items-center">
-                            <span className="text-sm font-medium text-slate-700">{month.short}</span>
-                            {month.isRevisionMonth && (
-                              <span className="ml-2 text-xs text-blue-600">(Revision)</span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="py-2 px-3 text-right">
-                          <span className="text-sm font-bold text-blue-600">{formatCurrency(month.monthlyTax)}</span>
-                        </td>
-                        <td className="py-2 px-3 text-right">
-                          <span className="text-sm text-slate-600">{formatCurrency(month.salary - month.monthlyTax)}</span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr className="border-t-2 border-slate-200 bg-slate-50">
-                      <td className="py-3 px-3">
-                        <span className="text-sm font-semibold text-slate-700">Total</span>
-                      </td>
-                      <td className="py-3 px-3 text-right">
-                        <span className="text-sm font-bold text-blue-600">{formatCurrency(calculations.taxWithoutMedical)}</span>
-                      </td>
-                      <td className="py-3 px-3 text-right">
-                        <span className="text-sm font-semibold text-slate-700">{formatCurrency(calculations.annualSalary - calculations.taxWithoutMedical)}</span>
-                      </td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-              
-            </div>
-          </div>
-
-          {/* Card 4: Monthly Tax Breakdown With Medical */}
-          <div className="bg-white rounded-2xl shadow-lg border-t-4 border-t-purple-500 overflow-hidden">
-            <div className="bg-purple-50 px-8 py-6 border-b border-purple-100">
-              <div>
-                <h3 className="text-xl font-bold text-purple-800 flex items-center">
-                  <BarChart3 className="w-5 h-5 mr-2" />
-                  Monthly Breakdown (With Medical)
-                </h3>
-                <p className="text-purple-600 text-sm">Month-wise tax after medical deduction</p>
-              </div>
-            </div>
-            <div className="p-8">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-slate-200">
-                      <th className="text-left py-2 px-3 text-xs font-medium text-slate-600">Month</th>
-                      <th className="text-right py-2 px-3 text-xs font-medium text-slate-600">Tax</th>
-                      <th className="text-right py-2 px-3 text-xs font-medium text-slate-600">Remaining</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {getMonthlyBreakdown(true).map((month) => (
-                      <tr 
-                        key={month.value}
-                        className={`border-b border-slate-100 ${
-                          month.isRevisionMonth ? 'bg-purple-50' : ''
-                        }`}
-                      >
-                        <td className="py-2 px-3">
-                          <div className="flex items-center">
-                            <span className="text-sm font-medium text-slate-700">{month.short}</span>
-                            {month.isRevisionMonth && (
-                              <span className="ml-2 text-xs text-purple-600">(Revision)</span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="py-2 px-3 text-right">
-                          <span className="text-sm font-bold text-purple-600">{formatCurrency(month.monthlyTax)}</span>
-                        </td>
-                        <td className="py-2 px-3 text-right">
-                          <span className="text-sm text-slate-600">{formatCurrency(month.salary - month.monthlyTax)}</span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr className="border-t-2 border-slate-200 bg-slate-50">
-                      <td className="py-3 px-3">
-                        <span className="text-sm font-semibold text-slate-700">Total</span>
-                      </td>
-                      <td className="py-3 px-3 text-right">
-                        <span className="text-sm font-bold text-purple-600">{formatCurrency(calculations.taxWithMedical)}</span>
-                      </td>
-                      <td className="py-3 px-3 text-right">
-                        <span className="text-sm font-semibold text-slate-700">{formatCurrency(calculations.annualTaxableSalary - calculations.taxWithMedical)}</span>
-                      </td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-
-            </div>
-          </div>
+          <MonthlyBreakdown
+            title="Monthly Breakdown (With Medical)"
+            description="Month-wise tax after medical deduction"
+            borderColor="purple-500"
+            textColor="purple-600"
+            bgColor="purple-50"
+            monthlyData={getMonthlyBreakdown(true)}
+            totalTax={calculations.taxWithMedical}
+            totalSalary={calculations.annualTaxableSalary}
+            formatCurrency={formatCurrency}
+          />
         </div>
 
-        {/* Footer */}
-        <footer className="bg-white border rounded-2xl border-gray-200 py-8 px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-            Work With Smart People, Save Time and Budget.
-            </h2>
-            <p className="text-gray-500 mb-6">
-              Whether you're looking to start a project or need consultation, feel free to contact me.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
-              <div className="flex flex-row text-left gap-4">
-              <img
-                src="https://framerusercontent.com/images/JYthbEKlRhiEUox0ac0JfUpbnyU.jpg?scale-down-to=512"
-                alt="Shahryar Minhas"
-                className="w-12 h-12 rounded-full border-2 border-gray-300"
-              />
-              <div>
-                <div className="font-medium text-gray-900">Shahryar Minhas</div>
-                <div className="text-sm text-gray-500">graphy918@gmail.com</div>
-              </div>
-              </div>
-              <div className="flex gap-3 mt-3 sm:mt-0">
-                <a
-                  href="https://wa.me/923104734347"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-green-600 hover:text-green-700 transition"
-                  aria-label="WhatsApp"
-                >
-                  {/* WhatsApp SVG */}
-                  <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                  </svg>
-                </a>
-
-                <a
-                  href="https://www.linkedin.com/in/shahryarminhas/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-700 hover:text-blue-900 transition"
-                  aria-label="LinkedIn"
-                >
-                  {/* LinkedIn SVG */}
-                  <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                  </svg>
-                </a>
-
-                <a
-                  href="https://x.com/shahryrajpoot"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-800 hover:text-black transition"
-                  aria-label="X"
-                >
-                  {/* X.com SVG */}
-                  <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                  </svg>
-                </a>
-
-                <a
-                  href="https://github.com/Muhammadshahryarminhas"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-800 hover:text-black transition"
-                  aria-label="GitHub"
-                >
-                  {/* GitHub SVG */}
-                  <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.084-.729.084-.729 1.205.084 1.84 1.236 1.84 1.236 1.07 1.834 2.809 1.304 3.495.997.108-.775.418-1.305.762-1.605-2.665-.305-5.466-1.334-5.466-5.93 0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23a11.52 11.52 0 0 1 3.003-.404c1.018.005 2.045.138 3.003.404 2.291-1.553 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.803 5.624-5.475 5.921.43.372.823 1.102.823 2.222 0 1.606-.014 2.898-.014 3.293 0 .322.216.694.825.576C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
-                  </svg>
-                </a>
-                
-              </div>
-            </div>
-            <hr className="my-6 border-gray-200" />
-            <div className="text-gray-500 text-sm">
-              Created with <span className="text-red-500">♥</span> by{" "}
-              <a href="https://www.linkedin.com/in/shahryarminhas/" className="text-blue-600 hover:underline">@shahryrminhas</a>
-              {" "}at{" "}
-              <a href="https://solux.studio" className="text-[# FF6A12] hover:underline">SoluxStudio</a>
-            </div>
-          </div>
-        </footer>
+        <Footer />
       </div>
-      
-      {/* Visit Counter as a floating sticker */}
-      {/* <VisitCounter /> */}
     </div>
   );
 }
