@@ -1,6 +1,6 @@
 import React, { useState, useMemo, ChangeEvent } from 'react';
 import { Calculator, DollarSign, Receipt, Heart, ToggleLeft, ToggleRight, Calendar, BarChart3 } from 'lucide-react';
-import VisitCounter from './components/VisitCounter';
+// import VisitCounter from './components/VisitCounter';
 
 // Define types for tax slabs
 type TaxSlab = {
@@ -671,7 +671,7 @@ function App() {
       </div>
       
       {/* Visit Counter as a floating sticker */}
-      <VisitCounter />
+      {/* <VisitCounter /> */}
     </div>
   );
 }

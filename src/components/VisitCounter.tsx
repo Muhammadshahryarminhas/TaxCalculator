@@ -6,14 +6,27 @@ const VisitCounter: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Get stored visit count
-    const storedCount = localStorage.getItem('visitCount');
-    const count = storedCount ? parseInt(storedCount) : 0;
+    // Check if this page load has already been counted
+    const hasCounted = sessionStorage.getItem('hasCounted');
     
-    // Increment count
-    const newCount = count + 1;
-    localStorage.setItem('visitCount', newCount.toString());
-    setVisitCount(newCount);
+    if (!hasCounted) {
+      // Get stored visit count
+      const storedCount = localStorage.getItem('visitCount');
+      const count = storedCount ? parseInt(storedCount) : 0;
+      
+      // Increment count
+      const newCount = count + 1;
+      localStorage.setItem('visitCount', newCount.toString());
+      setVisitCount(newCount);
+      
+      // Mark this page load as counted
+      sessionStorage.setItem('hasCounted', 'true');
+    } else {
+      // If already counted, just display the current count
+      const storedCount = localStorage.getItem('visitCount');
+      setVisitCount(storedCount ? parseInt(storedCount) : 0);
+    }
+    
     setIsLoading(false);
   }, []);
 
