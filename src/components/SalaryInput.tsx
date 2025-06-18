@@ -34,13 +34,13 @@ const SalaryInput: React.FC<SalaryInputProps> = ({
   getFinancialYearPosition,
 }) => {
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
-      <h2 className="text-2xl font-semibold text-slate-700 mb-6 flex items-center">
+    <div className="flex flex-col bg-white rounded-2xl shadow-lg p-4 md:p-8 border border-slate-200 gap-4">
+      <h2 className="text-xl font-semibold text-slate-700 flex items-center">
         <DollarSign className="w-6 h-6 mr-2" />
         Salary Information
       </h2>
       
-      <div className="grid md:grid-cols-2 gap-6 my-5">
+      <div className="grid md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">
             {isRevised ? 'Initial Monthly Salary (PKR)' : 'Monthly Salary (PKR)'}
@@ -70,12 +70,12 @@ const SalaryInput: React.FC<SalaryInputProps> = ({
       </div>
 
       {/* Salary Revision Toggle */}
-      <div className="mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center">
-            <Calendar className="w-5 h-5 text-slate-600 mr-2" />
+      <div className=" p-4 bg-slate-50 rounded-lg border border-slate-200 ">
+        <div className="flex flex-col md:flex-row items-center justify-between space-y-2">
+          <div className="flex flex-col md:flex-row items-center gap-2">
+            <Calendar className="w-5 h-5 text-slate-600" />
             <span className="text-lg font-medium text-slate-700">Salary Revision</span>
-            <span className="ml-2 text-sm text-slate-500">(Financial Year: July - June)</span>
+            <span className="text-sm text-slate-500">(Financial Year: July - June)</span>
           </div>
           <button
             onClick={() => onIsRevisedChange(!isRevised)}
@@ -128,7 +128,7 @@ const SalaryInput: React.FC<SalaryInputProps> = ({
       
       {/* Salary Summary */}
       {isRevised && (
-        <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+        <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
           <p className="text-sm text-blue-700 font-medium">
             Salary revised from {months.find(m => m.value === revisionMonth)?.label} 
             ({formatCurrency(monthlySalary)} → {formatCurrency(newSalary)})

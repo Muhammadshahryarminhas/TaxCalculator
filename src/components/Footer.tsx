@@ -2,15 +2,15 @@ import React from 'react';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-white border rounded-2xl border-gray-200 py-8 px-4">
-      <div className="max-w-3xl mx-auto text-center">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+    <footer className="bg-white border rounded-2xl border-gray-200 p-4 md:p-8 ">
+      <div className="flex flex-col text-center gap-4">
+        <h2 className="text-2xl md:text-4xl font-semibold text-green-700">
           Work With Smart People, Save Time and Budget.
         </h2>
-        <p className="text-gray-500 mb-6">
+        <p className="text-gray-500">
           Whether you're looking to start a project or need consultation, feel free to contact me.
         </p>
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex flex-row text-left gap-4">
             <img
               src="https://framerusercontent.com/images/JYthbEKlRhiEUox0ac0JfUpbnyU.jpg?scale-down-to=512"
@@ -72,7 +72,7 @@ const Footer: React.FC = () => {
             </a>
           </div>
         </div>
-        <hr className="my-6 border-gray-200" />
+        <hr className="my-4 border-gray-200" />
         <div className="text-gray-500 text-sm">
           Created with <span className="text-red-500">♥</span> by{" "}
           <a href="https://www.linkedin.com/in/shahryarminhas/" className="text-blue-600 hover:underline">@shahryrminhas</a>

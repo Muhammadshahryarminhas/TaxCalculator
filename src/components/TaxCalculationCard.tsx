@@ -38,19 +38,19 @@ const TaxCalculationCard: React.FC<TaxCalculationCardProps> = ({
   };
 
   return (
-    <div className="grid lg:grid-cols-2 gap-8 mb-8">
+    <div className="grid lg:grid-cols-2 gap-4">
       {/* Card 1: Tax Without Medical Deduction */}
       <div className="bg-white rounded-2xl shadow-lg border-t-4 border-t-red-500 overflow-hidden">
-        <div className="bg-red-50 px-8 py-6 border-b border-red-100">
+        <div className="bg-red-50 px-6 py-4 md:px-8 md:py-6 border-b border-red-100">
           <div>
-            <h3 className="text-xl font-bold text-red-800 flex items-center">
-              <Receipt className="w-5 h-5 mr-2" />
+            <h3 className="text-xl font-bold text-red-800 flex items-center gap-2">
+              <Receipt className="w-5 h-5" />
               Tax Without Medical Deduction
             </h3>
             <p className="text-red-600 text-sm">Fiscal Year {fiscalYear}</p>
           </div>
         </div>
-        <div className="p-8">
+        <div className="p-4 md:p-8">
           <div className="space-y-4">
             <div className="flex justify-between items-center py-3 border-b border-slate-100">
               <span className="text-slate-600">Annual Tax</span>
@@ -79,16 +79,16 @@ const TaxCalculationCard: React.FC<TaxCalculationCardProps> = ({
 
       {/* Card 2: Tax With Medical Deduction */}
       <div className="bg-white rounded-2xl shadow-lg border-t-4 border-t-emerald-500 overflow-hidden">
-        <div className="bg-emerald-50 px-8 py-6 border-b border-emerald-100">
+        <div className="bg-emerald-50 px-6 py-4 md:px-8 md:py-6 border-b border-emerald-100">
           <div>
-            <h3 className="text-xl font-bold text-emerald-800 flex items-center">
-              <Heart className="w-5 h-5 mr-2" />
+            <h3 className="text-xl font-bold text-emerald-800 flex items-center gap-2">
+              <Heart className="w-5 h-5" />
               Tax With Medical Deduction
             </h3>
             <p className="text-emerald-600 text-sm">Fiscal Year {fiscalYear}</p>
           </div>
         </div>
-        <div className="p-8">
+        <div className="p-4 md:p-8">
           <div className="space-y-4">
             <div className="flex justify-between items-center py-3 border-b border-slate-100">
               <span className="text-slate-600">Annual Tax After Medical</span>

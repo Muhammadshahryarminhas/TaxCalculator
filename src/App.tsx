@@ -183,10 +183,10 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
-      <div className="max-w-7xl mx-auto">
+      <div className="flex flex-col gap-4 md:gap-8 max-w-7xl mx-auto">
         <Header fiscalYear={fiscalYear} onFiscalYearChange={setFiscalYear} />
         
-        <div className="mb-8">
+        <div>
           <SalaryInput
             monthlySalary={monthlySalary}
             newSalary={newSalary}
@@ -211,7 +211,7 @@ function App() {
           formatCurrency={formatCurrency}
         />
 
-        <div className="grid lg:grid-cols-2 gap-8 mb-8">
+        <div className="grid lg:grid-cols-2 gap-4">
           <MonthlyBreakdown
             title="Monthly Breakdown (No Medical)"
             description="Month-wise tax distribution"
