@@ -26,14 +26,14 @@ const MonthlyBreakdown: React.FC<MonthlyBreakdownProps> = ({
   formatCurrency,
 }) => {
   return (
-    <div className={`bg-white rounded-2xl shadow-lg border-t-4 border-t-${borderColor} overflow-hidden`}>
-      <div className={`bg-${bgColor} px-8 py-6 border-b border-${bgColor}`}>
+    <div className={`bg-white rounded-2xl shadow-lg border-t-4 ${borderColor} overflow-hidden`}>
+      <div className={`${bgColor} px-8 py-6 border-b ${bgColor}`}>
         <div>
-          <h3 className={`text-xl font-bold text-${textColor} flex items-center`}>
+          <h3 className={`text-xl font-bold ${textColor} flex items-center`}>
             <BarChart3 className="w-5 h-5 mr-2" />
             {title}
           </h3>
-          <p className={`text-${textColor} text-sm`}>{description}</p>
+          <p className={`${textColor} text-sm`}>{description}</p>
         </div>
       </div>
       <div className="p-8">
@@ -51,19 +51,19 @@ const MonthlyBreakdown: React.FC<MonthlyBreakdownProps> = ({
                 <tr 
                   key={month.value}
                   className={`border-b border-slate-100 ${
-                    month.isRevisionMonth ? `bg-${bgColor}` : ''
+                    month.isRevisionMonth ? bgColor : ''
                   }`}
                 >
                   <td className="py-2 px-3">
                     <div className="flex items-center">
                       <span className="text-sm font-medium text-slate-700">{month.short}</span>
                       {month.isRevisionMonth && (
-                        <span className={`ml-2 text-xs text-${textColor}`}>(Revision)</span>
+                        <span className={`ml-2 text-xs ${textColor}`}>(Revision)</span>
                       )}
                     </div>
                   </td>
                   <td className="py-2 px-3 text-right">
-                    <span className={`text-sm font-bold text-${textColor}`}>{formatCurrency(month.monthlyTax)}</span>
+                    <span className={`text-sm font-bold ${textColor}`}>{formatCurrency(month.monthlyTax)}</span>
                   </td>
                   <td className="py-2 px-3 text-right">
                     <span className="text-sm text-slate-600">{formatCurrency(month.salary - month.monthlyTax)}</span>
@@ -77,7 +77,7 @@ const MonthlyBreakdown: React.FC<MonthlyBreakdownProps> = ({
                   <span className="text-sm font-semibold text-slate-700">Total</span>
                 </td>
                 <td className="py-3 px-3 text-right">
-                  <span className={`text-sm font-bold text-${textColor}`}>{formatCurrency(totalTax)}</span>
+                  <span className={`text-sm font-bold ${textColor}`}>{formatCurrency(totalTax)}</span>
                 </td>
                 <td className="py-3 px-3 text-right">
                   <span className="text-sm font-semibold text-slate-700">{formatCurrency(totalSalary - totalTax)}</span>

@@ -215,9 +215,9 @@ function App() {
           <MonthlyBreakdown
             title="Monthly Breakdown (No Medical)"
             description="Month-wise tax distribution"
-            borderColor="blue-500"
-            textColor="blue-600"
-            bgColor="blue-50"
+            borderColor="border-blue-500"
+            textColor="text-blue-600"
+            bgColor="bg-blue-50"
             monthlyData={getMonthlyBreakdown(false)}
             totalTax={calculations.taxWithoutMedical}
             totalSalary={calculations.annualSalary}
@@ -227,9 +227,9 @@ function App() {
           <MonthlyBreakdown
             title="Monthly Breakdown (With Medical)"
             description="Month-wise tax after medical deduction"
-            borderColor="purple-500"
-            textColor="purple-600"
-            bgColor="purple-50"
+            borderColor="border-purple-500"
+            textColor="text-purple-600"
+            bgColor="bg-purple-50"
             monthlyData={getMonthlyBreakdown(true)}
             totalTax={calculations.taxWithMedical}
             totalSalary={calculations.annualTaxableSalary}
