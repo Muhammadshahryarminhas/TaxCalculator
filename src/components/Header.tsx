@@ -10,7 +10,7 @@ const Header: React.FC<HeaderProps> = ({ fiscalYear, onFiscalYearChange }) => {
     <div className="flex items-center justify-between mb-12">
       <div className="flex items-center">
         <img src="/favicon.png" alt="Tax Calculator" className="w-12 h-12 mr-3" />
-        <h1 className="text-4xl font-bold text-slate-800">Pakistan Income Tax Calculator {fiscalYear}</h1>
+        <h1 className="text-4xl font-bold text-slate-800">Pakistan Salary Tax Calculator {fiscalYear}</h1>
       </div>
       
       <div className="flex items-center">
