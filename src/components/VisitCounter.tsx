@@ -1,33 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { Users } from 'lucide-react';
 
+const API_URL = 'http://localhost:5000/visit';
+
 const VisitCounter: React.FC = () => {
   const [visitCount, setVisitCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Check if this page load has already been counted
     const hasCounted = sessionStorage.getItem('hasCounted');
-    
+
+    const fetchVisitCount = async () => {
+      try {
+        // Always POST, since the backend only supports POST
+        const response = await fetch(API_URL, { method: 'POST' });
+        const data = await response.json();
+        setVisitCount(data.totalVisits);
+      } catch (error) {
+        setVisitCount(0);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     if (!hasCounted) {
-      // Get stored visit count
-      const storedCount = localStorage.getItem('visitCount');
-      const count = storedCount ? parseInt(storedCount) : 0;
-      
-      // Increment count
-      const newCount = count + 1;
-      localStorage.setItem('visitCount', newCount.toString());
-      setVisitCount(newCount);
-      
-      // Mark this page load as counted
+      // First visit in this session: count and fetch
+      fetchVisitCount();
       sessionStorage.setItem('hasCounted', 'true');
     } else {
-      // If already counted, just display the current count
-      const storedCount = localStorage.getItem('visitCount');
-      setVisitCount(storedCount ? parseInt(storedCount) : 0);
+      // Already counted in this session: just fetch (POST again)
+      fetchVisitCount();
     }
-    
-    setIsLoading(false);
   }, []);
 
   return (
