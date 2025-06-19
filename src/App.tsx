@@ -4,6 +4,7 @@ import SalaryInput from './components/SalaryInput';
 import TaxCalculationCard from './components/TaxCalculationCard';
 import MonthlyBreakdown from './components/MonthlyBreakdown';
 import Footer from './components/Footer';
+import VisitCounter from './components/VisitCounter';
 import { TaxSlabs, Month, Calculations } from './components/types';
 
 // Tax calculation functions for different fiscal years
@@ -236,7 +237,7 @@ function App() {
             formatCurrency={formatCurrency}
           />
         </div>
-
+        <VisitCounter></VisitCounter>
         <Footer />
       </div>
     </div>
